@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/big_event
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:password}
+
+server:
+  port: 3000
+  servlet:
+    context-path: /api
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
