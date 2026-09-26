@@ -17,30 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Validated
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/user")
 public class UserController {
 
 
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<Result<UserVO>> register(
-            @Pattern(regexp = "^\\S{5,16}$", message = "用户名必须是5~16位非空字符") String username,
-            @Pattern(regexp = "^\\S{5,16}$", message = "密码必须是5~16位非空字符") String password) {
-        // 查询用户
-        UserVO userVO = userService.register(username, password);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Result.success(userVO));
-    }
-
-    @PostMapping("/login")
-    public Result<LoginResponseVO> login(@Pattern(regexp = "^\\S{5,16}$", message = "用户名必须是5~16位非空字符") String username,
-                                         String password) {
-        // 查询用户
-        LoginResponseVO loginResponseVO = userService.login(username, password);
-        return Result.success(loginResponseVO);
-    }
 }
