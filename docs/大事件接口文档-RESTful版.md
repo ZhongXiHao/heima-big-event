@@ -62,7 +62,7 @@ Authorization: Bearer <登录时下发的JWT令牌>
 
 ```json
 {
-    "status": 400,
+    "code": 400,
     "message": "用户名必须是5~16位非空字符"
 }
 ```
@@ -721,9 +721,9 @@ Authorization: Bearer <登录时下发的JWT令牌>
 
 | | V1.0 | V2.0 |
 | - | ---- | ---- |
-| 成功判断 | body 里 `status == 0` | HTTP 状态码为 2xx |
+| 成功判断 | body 里 `code == 0` | HTTP 状态码为 2xx |
 | 成功数据 | 包在 `data` 字段里 | 响应体就是资源本身 |
-| 失败信息 | `status: 1` + `message`，HTTP 仍为 200 | 4xx/5xx + `{status, message}` |
+| 失败信息 | `code: 1` + `message`，HTTP 仍为 200 | 4xx/5xx + `{code, message}` |
 | 认证头 | `Authorization: <token>` | `Authorization: Bearer <token>` |
 
 ---
@@ -737,13 +737,13 @@ Authorization: Bearer <登录时下发的JWT令牌>
   - 路径里的 ID 用 `@PathVariable Integer id` 接收；请求体用 `@RequestBody`。
   - 登录、注册不再是 `@RequestParam`，改为 `@RequestBody`（建议给登录、注册各建一个请求 DTO）。
 - **状态码**
-  - 创建接口加 `@ResponseStatus(HttpStatus.CREATED)`，或返回 `ResponseEntity.status(201).body(...)`。
+  - 创建接口加 `@ResponseStatus(HttpStatus.CREATED)`，或返回 `ResponseEntity.code(201).body(...)`。
   - 删除、更新头像、更新密码返回 204：`@ResponseStatus(HttpStatus.NO_CONTENT)`，方法返回 `void`。
 - **异常处理**
-  - 用 `@RestControllerAdvice` + `@ExceptionHandler` 把异常映射成 400 / 401 / 404 / 409，统一输出 `{status, message}`。
+  - 用 `@RestControllerAdvice` + `@ExceptionHandler` 把异常映射成 400 / 401 / 404 / 409，统一输出 `{code, message}`。
   - 参数校验失败（`MethodArgumentNotValidException`）→ 400。
   - 可以自定义 `NotFoundException`、`ConflictException` 等业务异常，在 Service 层抛出。
-  - Spring Boot 3 内置了 `ProblemDetail`（RFC 9457），想更标准可以用它替换 `{status, message}`。
+  - Spring Boot 3 内置了 `ProblemDetail`（RFC 9457），想更标准可以用它替换 `{code, message}`。
 - **拦截器**
   - 解析 `Authorization` 时先去掉 `Bearer ` 前缀，再校验 JWT。
   - 校验失败返回 401；校验成功后把用户信息放进 `ThreadLocal`，请求结束后 `remove()`。
@@ -755,8 +755,8 @@ Authorization: Bearer <登录时下发的JWT令牌>
 - **请求拦截器**：`config.headers.Authorization = \`Bearer ${token}\``。
 - **响应处理**
   - 成功回调里直接使用 `res.data`（不再有 `res.data.data`）。
-  - 失败统一在响应拦截器的错误分支处理：读取 `error.response.status` 和 `error.response.data.message` 弹出提示；遇到 401 清除 token 并跳转登录页。
-  - 不再判断 `status === 0`。
+  - 失败统一在响应拦截器的错误分支处理：读取 `error.response.code` 和 `error.response.data.message` 弹出提示；遇到 401 清除 token 并跳转登录页。
+  - 不再判断 `code === 0`。
 - **接口封装**：把 API 文件里的路径和方法按附录 A 改一遍；ID 用模板字符串拼进路径（`` `/articles/${id}` ``）。
 - **提交方式**：注册、登录、更新头像原先是表单或 query 参数，现在统一提交 JSON 对象。
 - **修改密码**：请求体字段名改为 `oldPwd`、`newPwd`、`rePwd`；成功后（204）清除 token 并跳转登录页。

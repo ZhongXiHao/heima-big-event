@@ -3,13 +3,13 @@ package com.cshlands.pojo;
 
 //统一响应结果
 public class Result<T> {
-    private int status;
+    private int code;
     private String msg;
     private T data;
 
     public static <T> Result<T> success(T data) {
         Result<T> r = new Result<>();
-        r.setStatus(200);
+        r.setCode(200);
         r.setMsg("success");
         r.setData(data);
         return r;
@@ -21,18 +21,18 @@ public class Result<T> {
 
     public static <T> Result<T> error(int code, String msg) {
         Result<T> r = new Result<>();
-        r.setStatus(code);
+        r.setCode(code);
         r.setMsg(msg);
         r.setData(null);
         return r;
     }
 
-    public int getStatus() {
-        return status;
+    public int getCode() {
+        return code;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setCode(int code) {
+        this.code = code;
     }
 
     public String getMsg() {

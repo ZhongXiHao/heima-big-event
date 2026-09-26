@@ -4,16 +4,25 @@ import com.cshlands.exception.BusinessException;
 import com.cshlands.mapper.UserMapper;
 import com.cshlands.pojo.User;
 import com.cshlands.service.UserService;
+import com.cshlands.utils.JwtUtil;
 import com.cshlands.utils.Md5Util;
+import com.cshlands.vo.LoginResponseVO;
 import com.cshlands.vo.UserVO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class UserServiceImpl implements UserService {
+    @Autowired
+    JwtUtil jwtUtil;
+
+
     private final UserMapper userMapper;
 
     public UserServiceImpl(UserMapper userMapper) {
@@ -41,6 +50,20 @@ public class UserServiceImpl implements UserService {
         userMapper.register(user);
 
         return toVO(user);
+    }
+
+    @Override
+    public LoginResponseVO login(String username, String password) {
+        User user = userMapper.findByUserName(username);
+        if (user == null || !user.getPassword().equals(Md5Util.getMD5String(password))) {
+            throw BusinessException.unauthorized("用户名或密码错误");
+        }
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("username", user.getUsername());
+        String token = jwtUtil.genToken(claims);
+        return new LoginResponseVO(token, username);
     }
 
 

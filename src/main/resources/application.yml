@@ -13,3 +13,7 @@ server:
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
+
+jwt:
+    secret: ${JWT_SECRET:dev-only-secret-please-change-me-0123456789}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
