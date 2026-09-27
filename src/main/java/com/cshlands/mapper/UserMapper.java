@@ -22,6 +22,10 @@ public interface UserMapper {
             "set nickname = #{nickname}, email = #{email}, user_pic = #{userPic}, update_time = #{updateTime} " +
             "where username = #{username}")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void updateUser(User user);
+    void updateUserInfo(User user);
+
+    @Update("update user set user_pic = #{userPic}, update_time = #{updateTime}" +
+            " where username = #{username}")
+    void updateUserAvatar(User user);
 
 }

@@ -1,5 +1,7 @@
 package com.cshlands.controller;
 
+import com.cshlands.dto.UpdateAvatarDTO;
+import com.cshlands.dto.UpdateUserDTO;
 import com.cshlands.exception.BusinessException;
 import com.cshlands.pojo.Result;
 import com.cshlands.pojo.User;
@@ -39,12 +41,15 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public Result<UserVO> updateMe(@RequestBody @Validated User user) {
-        Map<String, Object> claims = ThreadLocalUtil.get();
-        Integer currentUserId = (Integer) claims.get("id");
-        user.setId(currentUserId);
-        UserVO updatedUserVO = userService.updateUserInfo(user);
+    public Result<UserVO> updateMe(@RequestBody @Validated UpdateUserDTO dto) {
+        UserVO updatedUserVO = userService.updateUserInfo(dto);
         return Result.success(updatedUserVO);
+    }
+
+    @PutMapping("/me/avatar")
+    public Result<Void> updateAvatar(@RequestBody @Validated UpdateAvatarDTO dto) {
+        userService.updateUserAvatar(dto.getAvatarUrl());
+        return Result.success();
     }
 
 }
