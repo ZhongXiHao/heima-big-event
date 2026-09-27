@@ -29,4 +29,27 @@ public class UserServiceImpl implements UserService {
     public User findByUserName(String username) {
         return userMapper.findByUserName(username);
     }
+
+    @Override
+    public UserVO getUserInfo(String username) {
+        User user = userMapper.findByUserName(username);
+        if (user == null) {
+            throw BusinessException.notFound("用户未找到");
+        }
+        return toVO(user);
+    }
+
+
+
+    private UserVO toVO(User user) {
+        UserVO vo = new UserVO();
+        vo.setId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setNickname(user.getNickname());
+        vo.setEmail(user.getEmail());
+        vo.setUserPic(user.getUserPic());
+        vo.setCreateTime(user.getCreateTime());
+        vo.setUpdateTime(user.getUpdateTime());
+        return vo;
+    }
 }
