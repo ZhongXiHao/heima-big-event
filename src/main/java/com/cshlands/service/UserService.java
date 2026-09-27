@@ -1,5 +1,6 @@
 package com.cshlands.service;
 
+import com.cshlands.dto.UpdatePasswordDTO;
 import com.cshlands.dto.UpdateUserDTO;
 import com.cshlands.pojo.User;
 import com.cshlands.vo.LoginResponseVO;
@@ -18,4 +19,5 @@ public interface UserService {
 
     void updateUserAvatar(String avatar);
 
+    void updateUserPassword(UpdatePasswordDTO dto);
 }

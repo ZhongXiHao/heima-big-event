@@ -1,6 +1,7 @@
 package com.cshlands.controller;
 
 import com.cshlands.dto.UpdateAvatarDTO;
+import com.cshlands.dto.UpdatePasswordDTO;
 import com.cshlands.dto.UpdateUserDTO;
 import com.cshlands.exception.BusinessException;
 import com.cshlands.pojo.Result;
@@ -50,6 +51,12 @@ public class UserController {
     public Result<Void> updateAvatar(@RequestBody @Validated UpdateAvatarDTO dto) {
         userService.updateUserAvatar(dto.getAvatarUrl());
         return Result.success();
+    }
+
+    @PutMapping("/me/password")
+    public ResponseEntity<Void> updatePassword(@RequestBody @Validated UpdatePasswordDTO dto) {
+        userService.updateUserPassword(dto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

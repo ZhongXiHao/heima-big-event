@@ -1,24 +1,23 @@
 package com.cshlands.service.serviceImpl;
 
+import ch.qos.logback.core.util.StringUtil;
+import com.cshlands.dto.UpdatePasswordDTO;
 import com.cshlands.dto.UpdateUserDTO;
 import com.cshlands.exception.BusinessException;
 import com.cshlands.mapper.UserMapper;
 import com.cshlands.pojo.User;
 import com.cshlands.service.UserService;
-import com.cshlands.utils.JwtUtil;
 import com.cshlands.utils.Md5Util;
 import com.cshlands.utils.ThreadLocalUtil;
-import com.cshlands.vo.LoginResponseVO;
 import com.cshlands.vo.UserVO;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.micrometer.common.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
@@ -61,7 +60,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserAvatar(String avatar){
+    public void updateUserAvatar(String avatar) {
         Map<String, Object> claims = ThreadLocalUtil.get();
         Integer id = (Integer) claims.get("id");
         User user = userMapper.findById(id);
@@ -69,6 +68,32 @@ public class UserServiceImpl implements UserService {
         user.setUserPic(avatar);
         user.setUpdateTime(LocalDateTime.now());
         userMapper.updateUserAvatar(user);
+    }
+
+    @Override
+    public void updateUserPassword(UpdatePasswordDTO dto) {
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        Integer id = ((Number) claims.get("id")).intValue();
+
+        User user = userMapper.findById(id);
+        checkUserExist(user);
+
+        String oldPassword = dto.getOldPassword();
+        String newPassword = dto.getNewPassword();
+        String confirmNewPassword = dto.getConfirmNewPassword();
+
+        if (!newPassword.equals(confirmNewPassword)) {
+            throw BusinessException.badRequest("新密码与确认密码不一致");
+        }
+
+        String md5OldPassword = Md5Util.getMD5String(oldPassword);
+        if (!user.getPassword().equals(md5OldPassword)) {
+            throw BusinessException.badRequest("原密码错误");
+        }
+
+        user.setPassword(Md5Util.getMD5String(newPassword));
+        user.setUpdateTime(LocalDateTime.now());
+        userMapper.updateUserPassword(user);
     }
 
 

@@ -28,4 +28,7 @@ public interface UserMapper {
             " where username = #{username}")
     void updateUserAvatar(User user);
 
+    @Update("update user set password = #{password}, update_time = #{updateTime}" +
+            " where username = #{username}")
+    void updateUserPassword(User user);
 }
