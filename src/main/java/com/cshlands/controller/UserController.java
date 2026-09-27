@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Validated
+
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
@@ -36,6 +36,15 @@ public class UserController {
         String username = claims.get("username").toString();
         UserVO userVO = userService.getUserInfo(username);
         return Result.success(userVO);
+    }
+
+    @PutMapping("/me")
+    public Result<UserVO> updateMe(@RequestBody @Validated User user) {
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        Integer currentUserId = (Integer) claims.get("id");
+        user.setId(currentUserId);
+        UserVO updatedUserVO = userService.updateUserInfo(user);
+        return Result.success(updatedUserVO);
     }
 
 }

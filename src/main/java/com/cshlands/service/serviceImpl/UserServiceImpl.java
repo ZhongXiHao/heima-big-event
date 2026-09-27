@@ -31,6 +31,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findById(Integer id) {
+        return userMapper.findById(id);
+    }
+
+    @Override
     public UserVO getUserInfo(String username) {
         User user = userMapper.findByUserName(username);
         if (user == null) {
@@ -39,6 +44,18 @@ public class UserServiceImpl implements UserService {
         return toVO(user);
     }
 
+    @Override
+    public UserVO updateUserInfo(User updatedUser) {
+        User user = findById(updatedUser.getId());
+        if (user == null) {
+            throw BusinessException.notFound("用户未找到");
+        }
+        user.setNickname(updatedUser.getNickname());
+        user.setEmail(updatedUser.getEmail());
+        user.setUpdateTime(LocalDateTime.now());
+        userMapper.updateUser(user);
+        return toVO(user);
+    }
 
 
     private UserVO toVO(User user) {
