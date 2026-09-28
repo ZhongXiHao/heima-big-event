@@ -1,16 +1,19 @@
 package com.cshlands.service;
 
-import com.cshlands.dto.CreateArticleDTO;
-import com.cshlands.pojo.Article;
+import com.cshlands.dto.ArticleDTO;
 import com.cshlands.pojo.ArticleState;
 import com.cshlands.vo.ArticleVO;
 import com.cshlands.vo.PageArticleVO;
 
-import java.util.List;
-
 public interface ArticleService {
 
-    ArticleVO addArticle(CreateArticleDTO dto);
+    ArticleVO addArticle(ArticleDTO dto);
 
     PageArticleVO getArticles(Integer pageNum, Integer pageSize, Integer categoryId, ArticleState state);
+
+    ArticleVO getArticle(Integer articleId);
+
+    ArticleVO updateArticle(Integer articleId, ArticleDTO dto);
+
+    void deleteArticle(Integer articleId);
 }

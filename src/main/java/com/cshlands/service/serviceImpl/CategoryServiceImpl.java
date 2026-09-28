@@ -1,16 +1,14 @@
 package com.cshlands.service.serviceImpl;
 
-import com.cshlands.dto.CreateCategoryDTO;
+import com.cshlands.dto.CategoryDTO;
 import com.cshlands.exception.BusinessException;
+import com.cshlands.mapper.ArticleMapper;
 import com.cshlands.mapper.CategoryMapper;
 import com.cshlands.pojo.Category;
-import com.cshlands.pojo.Result;
-import com.cshlands.pojo.User;
 import com.cshlands.service.CategoryService;
 import com.cshlands.utils.JwtUtil;
 import com.cshlands.utils.ThreadLocalUtil;
 import com.cshlands.vo.CategoryVO;
-import com.cshlands.vo.PageArticleVO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,14 +18,16 @@ import java.util.Map;
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
+    private final ArticleMapper articleMapper;
 
-    public CategoryServiceImpl(CategoryMapper categoryMapper, JwtUtil jwtUtil) {
+    public CategoryServiceImpl(CategoryMapper categoryMapper,ArticleMapper articleMapper) {
         this.categoryMapper = categoryMapper;
+        this.articleMapper = articleMapper;
     }
 
 
     @Override
-    public CategoryVO addCategory(CreateCategoryDTO dto) {
+    public CategoryVO addCategory(CategoryDTO dto) {
         Integer userId = getCurrentUserId();
 
         Category category = new Category();
@@ -56,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryVO updateCategoryById(Integer categoryId, CreateCategoryDTO dto) {
+    public CategoryVO updateCategoryById(Integer categoryId, CategoryDTO dto) {
         Integer userId = getCurrentUserId();
         Category category = getOwnedCategoryOrThrow(categoryId, userId);
         category.setCategoryAlias(dto.getCategoryAlias());
@@ -70,6 +70,9 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategoryById(Integer categoryId) {
         Integer userId = getCurrentUserId();
         getOwnedCategoryOrThrow(categoryId, userId);
+        if (articleMapper.countByCategoryId(categoryId) > 0) {
+            throw BusinessException.conflict("该分类下还有文章，无法删除");
+        }
         categoryMapper.deleteById(categoryId);
     }
 

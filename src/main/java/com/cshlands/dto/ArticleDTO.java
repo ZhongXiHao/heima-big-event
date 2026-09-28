@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.URL;
 
 @Setter
 @Getter
-public class CreateArticleDTO {
+public class ArticleDTO {
     @NotBlank
     @Pattern(regexp = "^\\S{1,10}", message = "标题必须是1~10个非空字符")
     private String title; //1~10个非空字符

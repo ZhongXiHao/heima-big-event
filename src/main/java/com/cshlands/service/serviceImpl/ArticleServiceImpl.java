@@ -1,6 +1,6 @@
 package com.cshlands.service.serviceImpl;
 
-import com.cshlands.dto.CreateArticleDTO;
+import com.cshlands.dto.ArticleDTO;
 import com.cshlands.exception.BusinessException;
 import com.cshlands.mapper.ArticleMapper;
 import com.cshlands.mapper.CategoryMapper;
@@ -33,7 +33,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public ArticleVO addArticle(CreateArticleDTO dto) {
+    public ArticleVO addArticle(ArticleDTO dto) {
         Integer userId = getCurrentUserId();
         Integer categoryId = dto.getCategoryId();
         getOwnedCategoryOrThrow(categoryId, userId);
@@ -68,6 +68,34 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
+    @Override
+    public ArticleVO getArticle(Integer articleId) {
+        Integer userId = getCurrentUserId();
+        Article article = getOwnedArticleOrThrow(articleId, userId);
+        return toVO(article);
+    }
+
+    @Override
+    public ArticleVO updateArticle(Integer articleId, ArticleDTO dto) {
+        Integer userId = getCurrentUserId();
+        Article article = getOwnedArticleOrThrow(articleId, userId);
+        article.setCreateUser(userId);
+        article.setTitle(dto.getTitle());
+        article.setContent(dto.getContent());
+        article.setCoverImg(dto.getCoverImg());
+        article.setUpdateTime(LocalDateTime.now().withNano(0));
+        article.setState(dto.getState());
+        articleMapper.updateArticle(article);
+        return toVO(article);
+    }
+
+    @Override
+    public void deleteArticle(Integer articleId) {
+        Integer userId = getCurrentUserId();
+        getOwnedArticleOrThrow(articleId, userId);
+        articleMapper.deleteByIdAndUser(articleId, userId);
+    }
+
     private Integer getCurrentUserId() {
         Map<String, Object> claims = ThreadLocalUtil.get();
         return ((Number) claims.get("id")).intValue();
@@ -86,4 +114,14 @@ public class ArticleServiceImpl implements ArticleService {
         BeanUtils.copyProperties(article, articleVO);
         return articleVO;
     }
+
+    private Article getOwnedArticleOrThrow(Integer articleId, Integer userId) {
+        Article article = articleMapper.selectByIdAndUser(articleId, userId);
+        if (article == null) {
+            throw BusinessException.notFound("文章不存在");
+        }
+        return article;
+    }
+
+
 }

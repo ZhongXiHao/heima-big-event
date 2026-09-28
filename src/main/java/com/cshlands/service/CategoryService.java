@@ -1,21 +1,18 @@
 package com.cshlands.service;
 
-import com.cshlands.dto.CreateCategoryDTO;
-import com.cshlands.pojo.Category;
-import com.cshlands.pojo.Result;
+import com.cshlands.dto.CategoryDTO;
 import com.cshlands.vo.CategoryVO;
-import com.cshlands.vo.PageArticleVO;
 
 import java.util.List;
 
 public interface CategoryService {
-    CategoryVO addCategory(CreateCategoryDTO dto);
+    CategoryVO addCategory(CategoryDTO dto);
 
     List<CategoryVO> getAllCategories();
 
     CategoryVO getCategoryById(Integer categoryId);
 
-    CategoryVO updateCategoryById(Integer categoryId, CreateCategoryDTO dto);
+    CategoryVO updateCategoryById(Integer categoryId, CategoryDTO dto);
 
     void deleteCategoryById(Integer categoryId);
 }

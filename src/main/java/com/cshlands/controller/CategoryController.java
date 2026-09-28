@@ -1,11 +1,9 @@
 package com.cshlands.controller;
 
-import com.cshlands.dto.CreateCategoryDTO;
-import com.cshlands.pojo.Category;
+import com.cshlands.dto.CategoryDTO;
 import com.cshlands.pojo.Result;
 import com.cshlands.service.CategoryService;
 import com.cshlands.vo.CategoryVO;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +23,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Result<CategoryVO>> addCategory(@RequestBody @Validated CreateCategoryDTO dto) {
+    public ResponseEntity<Result<CategoryVO>> addCategory(@RequestBody @Validated CategoryDTO dto) {
         CategoryVO categoryVO = categoryService.addCategory(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(Result.success(categoryVO));
     }
@@ -43,7 +41,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public Result<CategoryVO> updateCategoryById(@PathVariable Integer id, @RequestBody @Validated CreateCategoryDTO dto) {
+    public Result<CategoryVO> updateCategoryById(@PathVariable Integer id, @RequestBody @Validated CategoryDTO dto) {
         CategoryVO categoryVO = categoryService.updateCategoryById(id, dto);
         return Result.success(categoryVO);
     }
