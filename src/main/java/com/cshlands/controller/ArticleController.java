@@ -1,13 +1,17 @@
 package com.cshlands.controller;
 
+import com.cshlands.dto.ArticleListDTO;
+import com.cshlands.dto.CreateArticleDTO;
 import com.cshlands.pojo.Article;
+import com.cshlands.pojo.ArticleState;
 import com.cshlands.pojo.Result;
 import com.cshlands.service.ArticleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.cshlands.vo.ArticleVO;
+import com.cshlands.vo.PageArticleVO;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,12 +19,24 @@ import java.util.List;
 @RequestMapping("/articles")
 public class ArticleController {
     private final ArticleService articleService;
+
     public ArticleController(ArticleService articleService) {
         this.articleService = articleService;
     }
 
+    @PostMapping
+    public ResponseEntity<ArticleVO> addArticle(@RequestBody @Validated CreateArticleDTO dto) {
+        ArticleVO articleVO = articleService.addArticle(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(articleVO);
+    }
+
     @GetMapping
-    public Result<List<Article>> list() {
-        return Result.success(articleService.list());
+    public Result<PageArticleVO> getArticles(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) ArticleState state) {
+        PageArticleVO articles = articleService.getArticles(pageNum, pageSize, categoryId, state);
+        return Result.success(articles);
     }
 }
