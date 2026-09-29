@@ -717,7 +717,7 @@ Authorization: Bearer <登录时下发的JWT令牌>
 | 删除文章 | `DELETE /article?id=` | `DELETE /articles/{id}` |
 | 文件上传 | `POST /upload`，返回字符串 | `POST /files`，返回 `{url}` |
 
-**响应格式的整体变化**
+**响应格式的整体变化	**
 
 | | V1.0 | V2.0 |
 | - | ---- | ---- |
