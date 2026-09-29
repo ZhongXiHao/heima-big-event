@@ -28,6 +28,10 @@ public class BusinessException extends RuntimeException {
         return new BusinessException(HttpStatus.BAD_REQUEST, message);
     }
 
+    public static BusinessException internalServerError(String message) {
+        return new BusinessException(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    }
+
     public int getCode() {
         return code;
     }

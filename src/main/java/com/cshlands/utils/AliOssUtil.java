@@ -7,6 +7,7 @@ import com.aliyun.sdk.service.oss2.credentials.EnvironmentVariableCredentialsPro
 import com.aliyun.sdk.service.oss2.models.PutObjectRequest;
 import com.aliyun.sdk.service.oss2.models.PutObjectResult;
 import com.aliyun.sdk.service.oss2.transport.BinaryData;
+import com.cshlands.exception.BusinessException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,6 +58,7 @@ public class AliOssUtil {
             //    System.out.printf("ServiceException: requestId:%s, errorCode:%s\n", se.requestId(), se.errorCode());
             //}
             System.out.printf("error:\n%s", e);
+            throw BusinessException.internalServerError("Failed to upload file to Aliyun OSS");
         }
 
         return url;
