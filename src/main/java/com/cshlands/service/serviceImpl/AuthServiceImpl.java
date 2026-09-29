@@ -8,11 +8,14 @@ import com.cshlands.utils.JwtUtil;
 import com.cshlands.utils.Md5Util;
 import com.cshlands.vo.LoginResponseVO;
 import com.cshlands.vo.UserVO;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -20,10 +23,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public AuthServiceImpl(UserMapper userMapper, JwtUtil jwtUtil) {
+    public AuthServiceImpl(UserMapper userMapper, JwtUtil jwtUtil, StringRedisTemplate stringRedisTemplate) {
         this.userMapper = userMapper;
         this.jwtUtil = jwtUtil;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
 
@@ -56,6 +61,9 @@ public class AuthServiceImpl implements AuthService {
         claims.put("id", user.getId());
         claims.put("username", user.getUsername());
         String token = jwtUtil.genToken(claims);
+        // 将 token 存储到 redis 中
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+        operations.set(token, token, jwtUtil.getExpirationMs(), TimeUnit.MILLISECONDS);
         return new LoginResponseVO(token, username);
     }
 

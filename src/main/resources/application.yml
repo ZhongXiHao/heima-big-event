@@ -4,6 +4,10 @@ spring:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/big_event
     username: ${MYSQL_USER:root}
     password: ${MYSQL_PASSWORD:password}
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 server:
   port: 3000
@@ -16,6 +20,5 @@ mybatis:
   type-handlers-package: com.cshlands.mapper.handler
 
 jwt:
-    secret: ${JWT_SECRET:dev-only-secret-please-change-me-0123456789}
-    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
-
+  secret: ${JWT_SECRET:dev-only-secret-please-change-me-0123456789}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}

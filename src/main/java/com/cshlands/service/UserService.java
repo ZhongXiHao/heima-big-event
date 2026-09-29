@@ -19,5 +19,5 @@ public interface UserService {
 
     void updateUserAvatar(String avatar);
 
-    void updateUserPassword(UpdatePasswordDTO dto);
+    void updateUserPassword(UpdatePasswordDTO dto, String token);
 }

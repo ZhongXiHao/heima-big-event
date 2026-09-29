@@ -2,6 +2,7 @@ package com.cshlands.utils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Getter
     @Value("${jwt.expiration-ms}")
     private int expirationMs;
 
@@ -35,5 +37,4 @@ public class JwtUtil {
                 .getClaim("claims")
                 .asMap();
     }
-
 }

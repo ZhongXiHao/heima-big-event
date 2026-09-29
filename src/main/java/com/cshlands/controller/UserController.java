@@ -54,8 +54,9 @@ public class UserController {
     }
 
     @PutMapping("/me/password")
-    public ResponseEntity<Void> updatePassword(@RequestBody @Validated UpdatePasswordDTO dto) {
-        userService.updateUserPassword(dto);
+    public ResponseEntity<Void> updatePassword(@RequestBody @Validated UpdatePasswordDTO dto, @RequestHeader("Authorization") String token) {
+        System.out.println(token);
+        userService.updateUserPassword(dto, token);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

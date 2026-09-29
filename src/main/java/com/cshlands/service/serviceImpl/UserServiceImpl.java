@@ -12,6 +12,8 @@ import com.cshlands.utils.ThreadLocalUtil;
 import com.cshlands.vo.UserVO;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,9 +23,11 @@ import java.util.Map;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public UserServiceImpl(UserMapper userMapper) {
+    public UserServiceImpl(UserMapper userMapper, StringRedisTemplate stringRedisTemplate) {
         this.userMapper = userMapper;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Override
@@ -71,7 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserPassword(UpdatePasswordDTO dto) {
+    public void updateUserPassword(UpdatePasswordDTO dto, String token) {
         Map<String, Object> claims = ThreadLocalUtil.get();
         Integer id = ((Number) claims.get("id")).intValue();
 
@@ -94,6 +98,10 @@ public class UserServiceImpl implements UserService {
         user.setPassword(Md5Util.getMD5String(newPassword));
         user.setUpdateTime(LocalDateTime.now());
         userMapper.updateUserPassword(user);
+
+        // 更新 redis 中的 token
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+        operations.getOperations().delete(token);
     }
 
 
