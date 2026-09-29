@@ -2,6 +2,7 @@ package com.cshlands.interceptors;
 
 import com.cshlands.exception.BusinessException;
 import com.cshlands.utils.JwtUtil;
+import com.cshlands.utils.RedisKeyUtil;
 import com.cshlands.utils.ThreadLocalUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,13 +33,20 @@ public class LoginInterceptor implements HandlerInterceptor {
             }
             String token = header.substring(7);
 
-            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-            String redisToken = operations.get(token);
-            if (redisToken == null) {
+            Map<String, Object> parsed = jwtUtil.parseToken(token);
+            Object userId = parsed.get("id");
+            if (userId == null) {
                 throw new RuntimeException();
             }
 
-            Map<String, Object> parsed = jwtUtil.parseToken(token);
+            // 单点登录：请求携带的 token 必须和该用户当前存活的 token 完全一致，
+            // 否则说明这个 token 已经被更晚一次登录顶替（或改密码后被清除）
+            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+            String redisToken = operations.get(RedisKeyUtil.loginTokenKey(userId));
+            if (redisToken == null || !redisToken.equals(token)) {
+                throw new RuntimeException();
+            }
+
             ThreadLocalUtil.set(parsed);
             return true;
         } catch (Exception e) {

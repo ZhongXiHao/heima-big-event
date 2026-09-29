@@ -8,12 +8,12 @@ import com.cshlands.mapper.UserMapper;
 import com.cshlands.pojo.User;
 import com.cshlands.service.UserService;
 import com.cshlands.utils.Md5Util;
+import com.cshlands.utils.RedisKeyUtil;
 import com.cshlands.utils.ThreadLocalUtil;
 import com.cshlands.vo.UserVO;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserPassword(UpdatePasswordDTO dto, String token) {
+    public void updateUserPassword(UpdatePasswordDTO dto) {
         Map<String, Object> claims = ThreadLocalUtil.get();
         Integer id = ((Number) claims.get("id")).intValue();
 
@@ -99,9 +99,8 @@ public class UserServiceImpl implements UserService {
         user.setUpdateTime(LocalDateTime.now());
         userMapper.updateUserPassword(user);
 
-        // 更新 redis 中的 token
-        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-        operations.getOperations().delete(token);
+        // 单点登录：改密码后清除该用户在 Redis 中的 token，使其所有已登录会话立即失效
+        stringRedisTemplate.delete(RedisKeyUtil.loginTokenKey(id));
     }
 
 

@@ -6,6 +6,7 @@ import com.cshlands.pojo.User;
 import com.cshlands.service.AuthService;
 import com.cshlands.utils.JwtUtil;
 import com.cshlands.utils.Md5Util;
+import com.cshlands.utils.RedisKeyUtil;
 import com.cshlands.vo.LoginResponseVO;
 import com.cshlands.vo.UserVO;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -61,9 +62,9 @@ public class AuthServiceImpl implements AuthService {
         claims.put("id", user.getId());
         claims.put("username", user.getUsername());
         String token = jwtUtil.genToken(claims);
-        // 将 token 存储到 redis 中
+        // 单点登录：以 userId 为 key 存储当前有效 token，新登录会覆盖旧 token，使旧 token 失效
         ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-        operations.set(token, token, jwtUtil.getExpirationMs(), TimeUnit.MILLISECONDS);
+        operations.set(RedisKeyUtil.loginTokenKey(user.getId()), token, jwtUtil.getExpirationMs(), TimeUnit.MILLISECONDS);
         return new LoginResponseVO(token, username);
     }
 

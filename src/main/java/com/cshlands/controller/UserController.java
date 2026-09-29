@@ -26,11 +26,9 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final JwtUtil jwtUtil;
 
-    public UserController(UserService userService, JwtUtil jwtUtil) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/me")
@@ -54,9 +52,8 @@ public class UserController {
     }
 
     @PutMapping("/me/password")
-    public ResponseEntity<Void> updatePassword(@RequestBody @Validated UpdatePasswordDTO dto, @RequestHeader("Authorization") String authorization) {
-        String token = authorization.substring(7);
-        userService.updateUserPassword(dto, token);
+    public ResponseEntity<Void> updatePassword(@RequestBody @Validated UpdatePasswordDTO dto) {
+        userService.updateUserPassword(dto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
