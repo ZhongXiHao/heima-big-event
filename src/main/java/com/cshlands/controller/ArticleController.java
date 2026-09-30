@@ -43,7 +43,7 @@ public class ArticleController {
     }
 
     @PutMapping("/{id}")
-    public Result<ArticleVO> updateArticle(@PathVariable Integer id, @RequestBody ArticleDTO dto) {
+    public Result<ArticleVO> updateArticle(@PathVariable Integer id, @RequestBody @Validated ArticleDTO dto) {
         ArticleVO article = articleService.updateArticle(id, dto);
         return Result.success(article);
     }

@@ -79,6 +79,8 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleVO updateArticle(Integer articleId, ArticleDTO dto) {
         Integer userId = getCurrentUserId();
         Article article = getOwnedArticleOrThrow(articleId, userId);
+        getOwnedCategoryOrThrow(dto.getCategoryId(), userId);
+        article.setCategoryId(dto.getCategoryId());
         article.setCreateUser(userId);
         article.setTitle(dto.getTitle());
         article.setContent(dto.getContent());
