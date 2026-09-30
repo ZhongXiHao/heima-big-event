@@ -5,7 +5,7 @@ import com.cshlands.mapper.UserMapper;
 import com.cshlands.pojo.User;
 import com.cshlands.service.AuthService;
 import com.cshlands.utils.JwtUtil;
-import com.cshlands.utils.Md5Util;
+import com.cshlands.utils.PasswordUtil;
 import com.cshlands.utils.RedisKeyUtil;
 import com.cshlands.vo.LoginResponseVO;
 import com.cshlands.vo.UserVO;
@@ -25,11 +25,13 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
     private final StringRedisTemplate stringRedisTemplate;
+    private final PasswordUtil passwordUtil;
 
-    public AuthServiceImpl(UserMapper userMapper, JwtUtil jwtUtil, StringRedisTemplate stringRedisTemplate) {
+    public AuthServiceImpl(UserMapper userMapper, JwtUtil jwtUtil, StringRedisTemplate stringRedisTemplate, PasswordUtil passwordUtil) {
         this.userMapper = userMapper;
         this.jwtUtil = jwtUtil;
         this.stringRedisTemplate = stringRedisTemplate;
+        this.passwordUtil = passwordUtil;
     }
 
 
@@ -43,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
         LocalDateTime now = LocalDateTime.now();
         User user = new User();
         user.setUsername(username);
-        user.setPassword(Md5Util.getMD5String(password));
+        user.setPassword(passwordUtil.encode(password));
         user.setCreateTime(now);
         user.setUpdateTime(now);
         userMapper.register(user);
@@ -54,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponseVO login(String username, String password) {
         User user = userMapper.findByUserName(username);
-        if (user == null || !user.getPassword().equals(Md5Util.getMD5String(password))) {
+        if (user == null || !passwordUtil.matches(password, user.getPassword())) {
             throw BusinessException.unauthorized("用户名或密码错误");
         }
 

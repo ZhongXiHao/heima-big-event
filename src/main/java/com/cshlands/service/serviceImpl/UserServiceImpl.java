@@ -7,7 +7,7 @@ import com.cshlands.exception.BusinessException;
 import com.cshlands.mapper.UserMapper;
 import com.cshlands.pojo.User;
 import com.cshlands.service.UserService;
-import com.cshlands.utils.Md5Util;
+import com.cshlands.utils.PasswordUtil;
 import com.cshlands.utils.RedisKeyUtil;
 import com.cshlands.utils.ThreadLocalUtil;
 import com.cshlands.vo.UserVO;
@@ -24,10 +24,12 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final StringRedisTemplate stringRedisTemplate;
+    private final PasswordUtil passwordUtil;
 
-    public UserServiceImpl(UserMapper userMapper, StringRedisTemplate stringRedisTemplate) {
+    public UserServiceImpl(UserMapper userMapper, StringRedisTemplate stringRedisTemplate, PasswordUtil passwordUtil) {
         this.userMapper = userMapper;
         this.stringRedisTemplate = stringRedisTemplate;
+        this.passwordUtil = passwordUtil;
     }
 
     @Override
@@ -90,12 +92,11 @@ public class UserServiceImpl implements UserService {
             throw BusinessException.badRequest("新密码与确认密码不一致");
         }
 
-        String md5OldPassword = Md5Util.getMD5String(oldPassword);
-        if (!user.getPassword().equals(md5OldPassword)) {
+        if (!passwordUtil.matches(oldPassword, user.getPassword())) {
             throw BusinessException.badRequest("原密码错误");
         }
 
-        user.setPassword(Md5Util.getMD5String(newPassword));
+        user.setPassword(passwordUtil.encode(newPassword));
         user.setUpdateTime(LocalDateTime.now());
         userMapper.updateUserPassword(user);
 
